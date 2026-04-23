@@ -1,6 +1,6 @@
 # NCTB Structured Hierarchical Database + RAG Workbench
 
-This project provides a **working local system** (SQLite + Streamlit) to store NCTB curriculum data in strict logical units and run retrieval tests.
+This project provides a **working local system** (SQLite + Streamlit) to store NCTB curriculum data in strict logical units and run retrieval tests with a GitHub-like repository browsing experience.
 
 ## Why this design (vs naive chunking)
 
@@ -64,6 +64,7 @@ LIMIT 5;
 
 ## Dashboard Features (Supabase-like workflow)
 
+- Repository-style folder browsing.
 - Create hierarchy folder nodes.
 - Create custom table schemas at any path.
 - Insert custom rows visually.
