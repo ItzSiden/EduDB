@@ -307,9 +307,7 @@ def get_stats() -> dict:
         "db_root":        DB_ROOT,
     }
 
-
 def list_all() -> list[dict]:
-    """List all version/class/subject combinations."""
     result = []
     for fpath in sorted(glob.glob(os.path.join(DB_ROOT, "*", "Class_*", "*.csv"))):
         parts = Path(fpath).parts
@@ -317,9 +315,11 @@ def list_all() -> list[dict]:
             ver  = parts[-3]
             cls  = int(parts[-2].replace("Class_", ""))
             subj = parts[-1][:-4]
-            # Count pages
+            # Count pages (rows minus header)
             with open(fpath, encoding="utf-8") as f:
-                pages = max(0, sum(1 for _ in f) - 1)
+                reader = csv.reader(f)
+                next(reader, None)  # skip header
+                pages = sum(1 for _ in reader)
             result.append({
                 "version": ver,
                 "class":   cls,
