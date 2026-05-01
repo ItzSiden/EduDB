@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduLumina Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:      #0d0d0d;
+  --ink-2:    #3a3a3a;
+  --ink-3:    #7a7a7a;
+  --paper:    #faf9f7;
+  --cream:    #f3f1ed;
+  --border:   #e2dfd9;
+  --border-2: #ccc8c0;
+  --accent:   #1a472a;
+  --accent-l: #d6ede0;
+  --blue:     #1b3f6e;
+  --blue-l:   #d8e6f5;
+  --danger:   #8b1a1a;
+  --danger-l: #fde8e8;
+  --gold:     #b87a1e;
+  --gold-l:   #fdf0d8;
+  --radius:   8px;
+  --sidebar:  220px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 14px;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: var(--sidebar);
+  background: var(--ink);
+  color: var(--paper);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-logo-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo-dot { width: 7px; height: 7px; background: #4caf82; border-radius: 50%; flex-shrink: 0; }
+.sidebar-sub { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 3px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+.nav-section { padding: 14px 10px 6px; }
+.nav-section-label { font-size: 9px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; padding: 0 8px; margin-bottom: 4px; }
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  transition: all 0.15s;
+  user-select: none;
+}
+.nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+.nav-item.active { background: rgba(255,255,255,0.1); color: #fff; }
+.nav-item.todo { opacity: 0.4; cursor: not-allowed; }
+.nav-icon { width: 16px; text-align: center; font-size: 14px; flex-shrink: 0; }
+.todo-badge { font-size: 9px; background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 3px; margin-left: auto; color: rgba(255,255,255,0.3); }
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.topbar {
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  flex-shrink: 0;
+}
+.topbar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-status { font-size: 12px; color: var(--ink-3); display: flex; align-items: center; gap: 5px; }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4caf82; }
+
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+
+/* ── Panels ── */
+.page { display: none; }
+.page.active { display: block; }
+
+.todo-page {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 60vh; color: var(--ink-3); text-align: center;
+}
+.todo-icon { font-size: 40px; margin-bottom: 16px; }
+.todo-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--ink-2); margin-bottom: 8px; }
+.todo-sub { font-size: 13px; }
+
+/* Stats bar */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.stat-val { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; }
+.stat-lbl { font-size: 11px; color: var(--ink-3); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Section */
+.section { margin-bottom: 24px; }
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px; font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* Cards */
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* Table */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th {
+  text-align: left; padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px; font-weight: 600; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  background: var(--cream);
+}
+.data-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: #fdfcfa; }
+.data-table .mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--blue); }
+.data-table .muted { color: var(--ink-3); }
+
+/* Buttons */
+button {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 13px; font-weight: 500;
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-2);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+button:hover { background: var(--cream); border-color: var(--ink-2); }
+button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+button.primary:hover { background: var(--ink-2); }
+button.danger { background: var(--danger-l); color: var(--danger); border-color: #f0b0b0; }
+button.danger:hover { background: #fdd; }
+button.small { padding: 4px 10px; font-size: 12px; }
+button.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.accent:hover { background: #155a22; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Form elements */
+input, select, textarea {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 13px;
+  padding: 8px 10px;
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(13,13,13,0.06);
+}
+textarea { resize: vertical; min-height: 120px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.6; }
+label { display: block; font-size: 11px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+.form-row { display: grid; gap: 10px; margin-bottom: 12px; }
+.form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+.form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+/* Modal */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45); z-index: 100;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: #fff; border-radius: 12px;
+  width: 560px; max-width: 95vw; max-height: 90vh;
+  overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.modal-header {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+.modal-close { background: none; border: none; font-size: 20px; color: var(--ink-3); cursor: pointer; padding: 0 4px; }
+.modal-close:hover { background: var(--cream); }
+.modal-body { padding: 20px; }
+.modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+
+/* Toast */
+.toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 200; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  padding: 10px 16px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  animation: slideIn 0.2s ease;
+  min-width: 220px;
+}
+.toast.ok { background: var(--accent); color: #fff; }
+.toast.err { background: var(--danger); color: #fff; }
+.toast.info { background: var(--ink); color: #fff; }
+@keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* Tags */
+.tag {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: 99px;
+}
+.tag-bangla { background: var(--gold-l); color: var(--gold); border: 1px solid #f0d090; }
+.tag-english { background: var(--blue-l); color: var(--blue); border: 1px solid #b0cce8; }
+.tag-ok { background: var(--accent-l); color: var(--accent); }
+.tag-empty { background: var(--cream); color: var(--ink-3); border: 1px solid var(--border-2); }
+
+/* Breadcrumb select row */
+.kb-selector {
+  display: flex; gap: 10px; align-items: flex-end;
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.kb-selector .field { flex: 1; }
+.kb-selector .field label { margin-bottom: 4px; }
+
+/* Pages table */
+.pages-wrap { max-height: 440px; overflow-y: auto; }
+.page-row {
+  display: grid; grid-template-columns: 60px 1fr 90px;
+  gap: 0; border-bottom: 1px solid var(--border);
+  align-items: stretch;
+}
+.page-row:last-child { border-bottom: none; }
+.page-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 500;
+  padding: 10px 12px;
+  background: var(--cream);
+  color: var(--ink-3);
+  border-right: 1px solid var(--border);
+  display: flex; align-items: flex-start;
+  justify-content: center; padding-top: 12px;
+}
+.page-content {
+  padding: 10px 12px;
+  font-size: 12px; line-height: 1.6;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.page-actions {
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 8px; align-items: center; justify-content: center;
+}
+.empty-state {
+  text-align: center; padding: 40px 20px; color: var(--ink-3);
+}
+.empty-icon { font-size: 32px; margin-bottom: 10px; }
+.empty-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--ink-2); margin-bottom: 6px; }
+
+/* Progress */
+.progress-bar { background: var(--cream); border-radius: 99px; height: 4px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.3s; }
+
+/* Inline editor */
+.inline-editor { display: none; padding: 8px 12px; border-top: 1px solid var(--border); background: #fffef8; }
+.inline-editor.open { display: block; }
+.inline-editor textarea { min-height: 80px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-text"><span class="logo-dot"></span> EduLumina</div>
+    <div class="sidebar-sub">Admin Panel</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Main</div>
+    <div class="nav-item active" onclick="showPage('kb')">
+      <span class="nav-icon">📚</span> Knowledge Base
+    </div>
+    <div class="nav-item todo" title="Coming soon">
+      <span class="nav-icon">📊</span> Dashboard
+      <span class="todo-badge">TODO</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Management</div>
+    <div class="nav-item todo" title="Coming soon">
+      <span class="nav-icon">👥</span> Users
+      <span class="todo-badge">TODO</span>
+    </div>
+    <div class="nav-item todo" title="Coming soon">
+      <span class="nav-icon">🔑</span> API Keys
+      <span class="todo-badge">TODO</span>
+    </div>
+    <div class="nav-item todo" title="Coming soon">
+      <span class="nav-icon">📈</span> Analytics
+      <span class="todo-badge">TODO</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">System</div>
+    <div class="nav-item todo" title="Coming soon">
+      <span class="nav-icon">⚙️</span> Settings
+      <span class="todo-badge">TODO</span>
+    </div>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Knowledge Base</div>
+    <div class="topbar-right">
+      <div class="topbar-status">
+        <span class="status-dot"></span>
+        <span id="api-status">Connected</span>
+      </div>
+      <button onclick="refreshAll()" class="small">↺ Refresh</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══════════════ KB PAGE ═══════════════ -->
+    <div class="page active" id="page-kb">
+
+      <!-- Stats -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-val" id="stat-subjects">—</div>
+          <div class="stat-lbl">Total Subjects</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-pages">—</div>
+          <div class="stat-lbl">Total Pages</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-bangla">—</div>
+          <div class="stat-lbl">Bangla Version</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-english">—</div>
+          <div class="stat-lbl">English Version</div>
+        </div>
+      </div>
+
+      <!-- Subject selector -->
+      <div class="kb-selector">
+        <div class="field">
+          <label>Version</label>
+          <select id="sel-version" onchange="onSelChange()">
+            <option value="Bangla">Bangla</option>
+            <option value="English">English</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Class</label>
+          <select id="sel-class" onchange="onSelChange()">
+            <option value="6">Class 6</option>
+            <option value="7">Class 7</option>
+            <option value="8">Class 8</option>
+            <option value="9">Class 9</option>
+            <option value="10">Class 10</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Subject</label>
+          <select id="sel-subject" onchange="loadPages()">
+            <option value="">— select —</option>
+          </select>
+        </div>
+        <button onclick="openAddSubjectModal()" class="primary" style="flex-shrink:0;align-self:flex-end">+ New Subject</button>
+        <button onclick="openBulkModal()" class="accent" style="flex-shrink:0;align-self:flex-end">⬇ Bulk Import</button>
+      </div>
+
+      <!-- Subject list + Pages -->
+      <div style="display:grid; grid-template-columns: 240px 1fr; gap:16px;">
+
+        <!-- Subject list -->
+        <div>
+          <div class="section-header">
+            <div class="section-title">Subjects</div>
+          </div>
+          <div class="card" id="subject-list">
+            <div class="empty-state" style="padding:24px">
+              <div class="empty-icon">📂</div>
+              <div style="font-size:12px;color:var(--ink-3)">Select version & class</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pages panel -->
+        <div>
+          <div class="section-header">
+            <div class="section-title">
+              Pages
+              <span id="pages-source" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-3);font-weight:400"></span>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button onclick="openAddPageModal()" class="small" id="btn-add-page" disabled>+ Add Page</button>
+              <button onclick="openSearchModal()" class="small">🔍 Test RAG</button>
+              <button onclick="deleteSubjectConfirm()" class="small danger" id="btn-del-subject" disabled>Delete Subject</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="pages-wrap" id="pages-container">
+              <div class="empty-state">
+                <div class="empty-icon">📄</div>
+                <div class="empty-title">No subject selected</div>
+                <div style="font-size:12px;color:var(--ink-3)">Pick a subject from the left panel</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-kb -->
+
+    <!-- ═══════════════ TODO PAGES ═══════════════ -->
+    <div class="page" id="page-dashboard">
+      <div class="todo-page">
+        <div class="todo-icon">📊</div>
+        <div class="todo-title">Dashboard — Coming Soon</div>
+        <div class="todo-sub">API usage, user traffic, revenue stats will appear here.</div>
+      </div>
+    </div>
+    <div class="page" id="page-users">
+      <div class="todo-page">
+        <div class="todo-icon">👥</div>
+        <div class="todo-title">User Management — Coming Soon</div>
+        <div class="todo-sub">View, manage, and upgrade users here.</div>
+      </div>
+    </div>
+    <div class="page" id="page-keys">
+      <div class="todo-page">
+        <div class="todo-icon">🔑</div>
+        <div class="todo-title">API Keys — Coming Soon</div>
+        <div class="todo-sub">Manage Groq, Cerebras, Gemini keys here.</div>
+      </div>
+    </div>
+    <div class="page" id="page-analytics">
+      <div class="todo-page">
+        <div class="todo-icon">📈</div>
+        <div class="todo-title">Analytics — Coming Soon</div>
+      </div>
+    </div>
+    <div class="page" id="page-settings">
+      <div class="todo-page">
+        <div class="todo-icon">⚙️</div>
+        <div class="todo-title">Settings — Coming Soon</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- Add Subject -->
+<div class="modal-overlay" id="modal-add-subject">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">New Subject</div>
+      <button class="modal-close" onclick="closeModal('modal-add-subject')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row cols-3">
+        <div>
+          <label>Version</label>
+          <select id="new-version">
+            <option>Bangla</option>
+            <option>English</option>
+          </select>
+        </div>
+        <div>
+          <label>Class</label>
+          <select id="new-class">
+            <option value="6">6</option><option value="7">7</option>
+            <option value="8">8</option><option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+        <div>
+          <label>Subject name</label>
+          <input type="text" id="new-subject-name" placeholder="e.g. Physics">
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--ink-3);padding:8px 10px;background:var(--cream);border-radius:6px;font-family:'JetBrains Mono',monospace" id="new-subject-preview">
+        database/Bangla/Class_6/Physics.csv
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeModal('modal-add-subject')">Cancel</button>
+      <button class="primary" onclick="createSubject()">Create Subject</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Page -->
+<div class="modal-overlay" id="modal-add-page">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Add Page</div>
+      <button class="modal-close" onclick="closeModal('modal-add-page')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div>
+          <label>Page number</label>
+          <input type="number" id="new-page-num" min="1" value="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Content</label>
+          <textarea id="new-page-content" placeholder="Paste page text here..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeModal('modal-add-page')">Cancel</button>
+      <button class="primary" onclick="addPage()">Add Page</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Import -->
+<div class="modal-overlay" id="modal-bulk">
+  <div class="modal" style="width:680px">
+    <div class="modal-header">
+      <div class="modal-title">Bulk Import — [PAGE_N] Format</div>
+      <button class="modal-close" onclick="closeModal('modal-bulk')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--ink-3);margin-bottom:12px;line-height:1.6">
+        Paste the full output from AI Studio. Each page must start with <code style="background:var(--cream);padding:1px 5px;border-radius:3px">[PAGE_N]</code> marker.
+      </div>
+      <div class="form-row cols-3">
+        <div>
+          <label>Version</label>
+          <select id="bulk-version"><option>Bangla</option><option>English</option></select>
+        </div>
+        <div>
+          <label>Class</label>
+          <select id="bulk-class">
+            <option value="6">6</option><option value="7">7</option>
+            <option value="8">8</option><option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+        <div>
+          <label>Subject</label>
+          <input type="text" id="bulk-subject" placeholder="e.g. Physics">
+        </div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label>Raw text (AI Studio output)</label>
+          <textarea id="bulk-text" style="min-height:220px" placeholder="[PAGE_1]&#10;অধ্যায় ১: পদার্থের অবস্থা&#10;পদার্থ তিনটি অবস্থায় থাকতে পারে...&#10;&#10;[PAGE_2]&#10;..."></textarea>
+        </div>
+      </div>
+      <div id="bulk-preview" style="display:none;padding:10px;background:var(--cream);border-radius:6px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--ink-3)"></div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="previewBulk()">👁 Preview</button>
+      <button onclick="closeModal('modal-bulk')">Cancel</button>
+      <button class="accent" onclick="bulkImport()">⬇ Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- RAG Test -->
+<div class="modal-overlay" id="modal-rag">
+  <div class="modal" style="width:640px">
+    <div class="modal-header">
+      <div class="modal-title">🔍 Test RAG Search</div>
+      <button class="modal-close" onclick="closeModal('modal-rag')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row" style="display:flex;gap:8px;margin-bottom:12px">
+        <input type="text" id="rag-query" placeholder="e.g. What is photosynthesis?" style="flex:1">
+        <button class="primary" onclick="testRag()" style="flex-shrink:0">Search</button>
+      </div>
+      <div id="rag-results"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Page -->
+<div class="modal-overlay" id="modal-edit-page">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="edit-page-title">Edit Page</div>
+      <button class="modal-close" onclick="closeModal('modal-edit-page')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-page-num">
+      <div class="form-row">
+        <div>
+          <label>Content</label>
+          <textarea id="edit-page-content" style="min-height:200px"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeModal('modal-edit-page')">Cancel</button>
+      <button class="primary" onclick="saveEditPage()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toasts"></div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────
+const API = window.location.origin; // same origin as backend
+let TOKEN = localStorage.getItem('admin_token') || '';
+
+// ── State ─────────────────────────────────────────────────────
+let currentVersion = 'Bangla';
+let currentClass   = '6';
+let currentSubject = '';
+let currentPages   = [];
+let allSubjects    = [];
+
+// ── Helpers ───────────────────────────────────────────────────
+function toast(msg, type='ok') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+async function api(method, path, body=null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${TOKEN}` },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  if (!r.ok) {
+    const err = await r.json().catch(() => ({ detail: r.statusText }));
+    throw new Error(err.detail || r.statusText);
+  }
+  return r.json();
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const titles = { kb: 'Knowledge Base', dashboard: 'Dashboard', users: 'Users', keys: 'API Keys', analytics: 'Analytics', settings: 'Settings' };
+  document.getElementById('topbar-title').textContent = titles[name] || name;
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+
+// ── Init ──────────────────────────────────────────────────────
+async function init() {
+  // Auto-login as admin if no token (dev mode — remove in production)
+  if (!TOKEN) {
+    try {
+      const r = await fetch(API + '/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'admin@edulumina.com', password: 'admin123' })
+      });
+      const d = await r.json();
+      TOKEN = d.token;
+      localStorage.setItem('admin_token', TOKEN);
+    } catch(e) { toast('Login failed — set TOKEN manually', 'err'); }
+  }
+  await refreshAll();
+}
+
+async function refreshAll() {
+  await loadStats();
+  await loadSubjectList();
+}
+
+async function loadStats() {
+  try {
+    const s = await api('GET', '/api/kb/stats');
+    document.getElementById('stat-subjects').textContent = s.total_subjects;
+    document.getElementById('stat-pages').textContent    = s.total_pages.toLocaleString();
+    document.getElementById('stat-bangla').textContent   = s.by_version?.Bangla || 0;
+    document.getElementById('stat-english').textContent  = s.by_version?.English || 0;
+  } catch(e) { toast('Stats error: ' + e.message, 'err'); }
+}
+
+// ── Subject management ────────────────────────────────────────
+function onSelChange() {
+  currentVersion = document.getElementById('sel-version').value;
+  currentClass   = document.getElementById('sel-class').value;
+  loadSubjectList();
+}
+
+async function loadSubjectList() {
+  currentVersion = document.getElementById('sel-version').value;
+  currentClass   = document.getElementById('sel-class').value;
+
+  try {
+    allSubjects = await api('GET', '/api/kb/list');
+    const filtered = allSubjects.filter(s =>
+      s.version === currentVersion && String(s.class) === String(currentClass)
+    );
+
+    const container = document.getElementById('subject-list');
+    const selSubject = document.getElementById('sel-subject');
+    selSubject.innerHTML = '<option value="">— select —</option>';
+
+    if (!filtered.length) {
+      container.innerHTML = `<div class="empty-state" style="padding:24px"><div class="empty-icon">📂</div><div style="font-size:12px;color:var(--ink-3)">No subjects yet</div></div>`;
+      return;
+    }
+
+    let html = '<table class="data-table">';
+    filtered.forEach(s => {
+      const tag = s.pages > 0
+        ? `<span class="tag tag-ok">${s.pages}p</span>`
+        : `<span class="tag tag-empty">empty</span>`;
+      html += `<tr onclick="selectSubject('${s.subject}')" style="cursor:pointer">
+        <td style="font-weight:500">${s.subject}</td>
+        <td>${tag}</td>
+      </tr>`;
+      selSubject.innerHTML += `<option value="${s.subject}">${s.subject} (${s.pages}p)</option>`;
+    });
+    html += '</table>';
+    container.innerHTML = html;
+  } catch(e) { toast('Load error: ' + e.message, 'err'); }
+}
+
+function selectSubject(name) {
+  document.getElementById('sel-subject').value = name;
+  loadPages();
+}
+
+async function loadPages() {
+  currentSubject = document.getElementById('sel-subject').value;
+  if (!currentSubject) {
+    document.getElementById('pages-container').innerHTML = `<div class="empty-state"><div class="empty-icon">📄</div><div class="empty-title">No subject selected</div></div>`;
+    document.getElementById('btn-add-page').disabled    = true;
+    document.getElementById('btn-del-subject').disabled = true;
+    document.getElementById('pages-source').textContent = '';
+    return;
+  }
+
+  document.getElementById('btn-add-page').disabled    = false;
+  document.getElementById('btn-del-subject').disabled = false;
+  document.getElementById('pages-source').textContent = `· ${currentVersion}/Class_${currentClass}/${currentSubject}.csv`;
+
+  try {
+    const data = await api('GET', `/api/kb/pages?version=${currentVersion}&class_num=${currentClass}&subject=${currentSubject}`);
+    currentPages = data.pages;
+    renderPages();
+  } catch(e) { toast('Load pages error: ' + e.message, 'err'); }
+}
+
+function renderPages() {
+  const container = document.getElementById('pages-container');
+  if (!currentPages.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">📄</div><div class="empty-title">No pages yet</div><div style="font-size:12px;color:var(--ink-3)">Add pages or use Bulk Import</div></div>`;
+    return;
+  }
+
+  const sorted = [...currentPages].sort((a,b) => parseInt(a.page) - parseInt(b.page));
+  let html = '';
+  sorted.forEach(p => {
+    const preview = p.content.length > 200 ? p.content.substring(0, 200) + '...' : p.content;
+    html += `
+    <div class="page-row" id="row-${p.page}">
+      <div class="page-num">${p.page}</div>
+      <div>
+        <div class="page-content">${escHtml(preview)}</div>
+        <div class="inline-editor" id="editor-${p.page}">
+          <textarea id="edit-ta-${p.page}">${escHtml(p.content)}</textarea>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button class="small primary" onclick="saveInline(${p.page})">Save</button>
+            <button class="small" onclick="closeInline(${p.page})">Cancel</button>
+          </div>
+        </div>
+      </div>
+      <div class="page-actions">
+        <button class="small" onclick="openInline(${p.page})" title="Edit">✏️</button>
+        <button class="small danger" onclick="deletePage(${p.page})" title="Delete">🗑</button>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function openInline(pageNum) {
+  document.querySelectorAll('.inline-editor').forEach(e => e.classList.remove('open'));
+  document.getElementById(`editor-${pageNum}`).classList.add('open');
+  document.getElementById(`edit-ta-${pageNum}`).value =
+    currentPages.find(p => String(p.page) === String(pageNum))?.content || '';
+}
+
+function closeInline(pageNum) {
+  document.getElementById(`editor-${pageNum}`).classList.remove('open');
+}
+
+async function saveInline(pageNum) {
+  const content = document.getElementById(`edit-ta-${pageNum}`).value.trim();
+  if (!content) return toast('Content cannot be empty', 'err');
+
+  // Update local state
+  const idx = currentPages.findIndex(p => String(p.page) === String(pageNum));
+  if (idx >= 0) currentPages[idx].content = content;
+
+  try {
+    await api('PUT', '/api/kb/pages', {
+      version: currentVersion, class_num: parseInt(currentClass),
+      subject: currentSubject, pages: currentPages
+    });
+    toast(`Page ${pageNum} saved`);
+    closeInline(pageNum);
+    await loadPages();
+  } catch(e) { toast('Save error: ' + e.message, 'err'); }
+}
+
+async function deletePage(pageNum) {
+  if (!confirm(`Delete page ${pageNum}?`)) return;
+  currentPages = currentPages.filter(p => String(p.page) !== String(pageNum));
+  try {
+    await api('PUT', '/api/kb/pages', {
+      version: currentVersion, class_num: parseInt(currentClass),
+      subject: currentSubject, pages: currentPages
+    });
+    toast(`Page ${pageNum} deleted`);
+    renderPages();
+    await loadStats();
+  } catch(e) { toast('Delete error: ' + e.message, 'err'); }
+}
+
+// ── Add Subject ───────────────────────────────────────────────
+function openAddSubjectModal() {
+  document.getElementById('new-version').value = currentVersion;
+  document.getElementById('new-class').value   = currentClass;
+  document.getElementById('new-subject-name').value = '';
+  updateSubjectPreview();
+  openModal('modal-add-subject');
+}
+
+function updateSubjectPreview() {
+  const v = document.getElementById('new-version').value;
+  const c = document.getElementById('new-class').value;
+  const s = document.getElementById('new-subject-name').value || 'SubjectName';
+  document.getElementById('new-subject-preview').textContent = `database/${v}/Class_${c}/${s}.csv`;
+}
+
+document.getElementById('new-version').addEventListener('change', updateSubjectPreview);
+document.getElementById('new-class').addEventListener('change', updateSubjectPreview);
+document.getElementById('new-subject-name').addEventListener('input', updateSubjectPreview);
+
+async function createSubject() {
+  const version   = document.getElementById('new-version').value;
+  const class_num = parseInt(document.getElementById('new-class').value);
+  const subject   = document.getElementById('new-subject-name').value.trim();
+  if (!subject) return toast('Enter subject name', 'err');
+
+  try {
+    await api('POST', '/api/kb/subject', { version, class_num, subject });
+    toast(`✅ Created ${version}/Class_${class_num}/${subject}`);
+    closeModal('modal-add-subject');
+    // Sync selectors
+    document.getElementById('sel-version').value = version;
+    document.getElementById('sel-class').value   = String(class_num);
+    currentVersion = version;
+    currentClass   = String(class_num);
+    await loadSubjectList();
+    selectSubject(subject);
+    await loadStats();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── Delete Subject ────────────────────────────────────────────
+async function deleteSubjectConfirm() {
+  if (!currentSubject) return;
+  if (!confirm(`Delete ${currentVersion}/Class_${currentClass}/${currentSubject}?\n\nThis will delete ALL pages permanently!`)) return;
+  try {
+    await api('DELETE', '/api/kb/subject', {
+      version: currentVersion, class_num: parseInt(currentClass), subject: currentSubject
+    });
+    toast('Subject deleted');
+    currentSubject = '';
+    document.getElementById('sel-subject').value = '';
+    await loadSubjectList();
+    await loadStats();
+    await loadPages();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── Add Page ──────────────────────────────────────────────────
+function openAddPageModal() {
+  if (!currentSubject) return toast('Select a subject first', 'err');
+  // Auto-set next page number
+  const maxPage = currentPages.length
+    ? Math.max(...currentPages.map(p => parseInt(p.page) || 0))
+    : 0;
+  document.getElementById('new-page-num').value     = maxPage + 1;
+  document.getElementById('new-page-content').value = '';
+  openModal('modal-add-page');
+}
+
+async function addPage() {
+  const page    = parseInt(document.getElementById('new-page-num').value);
+  const content = document.getElementById('new-page-content').value.trim();
+  if (!content) return toast('Content cannot be empty', 'err');
+
+  try {
+    await api('POST', '/api/kb/page', {
+      version: currentVersion, class_num: parseInt(currentClass),
+      subject: currentSubject, page, content
+    });
+    toast(`✅ Page ${page} added`);
+    closeModal('modal-add-page');
+    await loadPages();
+    await loadStats();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── Bulk Import ───────────────────────────────────────────────
+function openBulkModal() {
+  document.getElementById('bulk-version').value = currentVersion;
+  document.getElementById('bulk-class').value   = currentClass;
+  document.getElementById('bulk-subject').value = currentSubject || '';
+  document.getElementById('bulk-text').value    = '';
+  document.getElementById('bulk-preview').style.display = 'none';
+  openModal('modal-bulk');
+}
+
+function previewBulk() {
+  const text = document.getElementById('bulk-text').value;
+  const matches = [...text.matchAll(/\[PAGE_(\d+)\]/g)];
+  const preview = document.getElementById('bulk-preview');
+  if (!matches.length) {
+    preview.textContent = '⚠ No [PAGE_N] markers found';
+    preview.style.display = 'block';
+    return;
+  }
+  preview.textContent = `✓ Found ${matches.length} pages: ${matches.map(m => m[1]).join(', ')}`;
+  preview.style.display = 'block';
+}
+
+async function bulkImport() {
+  const version   = document.getElementById('bulk-version').value;
+  const class_num = parseInt(document.getElementById('bulk-class').value);
+  const subject   = document.getElementById('bulk-subject').value.trim();
+  const raw_text  = document.getElementById('bulk-text').value.trim();
+
+  if (!subject) return toast('Enter subject name', 'err');
+  if (!raw_text) return toast('Paste text first', 'err');
+
+  try {
+    const r = await api('POST', '/api/kb/bulk-import', { version, class_num, subject, raw_text });
+    toast(`✅ Imported ${r.imported} pages` + (r.warning ? ` (${r.warning})` : ''));
+    closeModal('modal-bulk');
+    // Sync to imported subject
+    document.getElementById('sel-version').value = version;
+    document.getElementById('sel-class').value   = String(class_num);
+    currentVersion = version;
+    currentClass   = String(class_num);
+    await loadSubjectList();
+    selectSubject(subject);
+    await loadStats();
+  } catch(e) { toast('Error: ' + e.message, 'err'); }
+}
+
+// ── RAG Test ──────────────────────────────────────────────────
+function openSearchModal() { openModal('modal-rag'); document.getElementById('rag-results').innerHTML = ''; }
+
+async function testRag() {
+  const query = document.getElementById('rag-query').value.trim();
+  if (!query) return;
+  const container = document.getElementById('rag-results');
+  container.innerHTML = '<div style="color:var(--ink-3);font-size:13px">Searching...</div>';
+
+  try {
+    // Direct db search via admin endpoint
+    const results = await api('GET', `/api/kb/list`);
+    // We'll use the chat endpoint without LLM just to test RAG
+    container.innerHTML = '<div style="font-size:12px;color:var(--ink-3);font-family:\'JetBrains Mono\',monospace">RAG test requires /api/chat endpoint with a valid session.<br>Check backend /docs for direct testing.</div>';
+  } catch(e) {
+    container.innerHTML = `<div style="color:var(--danger)">${e.message}</div>`;
+  }
+}
+
+// ── Close modals on overlay click ─────────────────────────────
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ── Start ─────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
