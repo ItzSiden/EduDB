@@ -24,7 +24,7 @@ from typing import Optional
 DB_ROOT = os.environ.get("DB_ROOT", "database")
 
 VERSIONS = ["Bangla", "English"]
-CLASSES  = [6, 7, 8, 9, 10]
+CLASSES = [6, 7, 8, "SSC"]
 
 
 # ── Init ──────────────────────────────────────────────────────
